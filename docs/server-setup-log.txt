@@ -1,0 +1,27 @@
+CloudByte server setup log
+Date: 2026-11-23
+Administrator: Noam Batat Van Dien
+
+Groups and users
+engineering: alice, bob, carol, dave
+marketing: emma, frank, grace
+operations: henry, iris, jack, kate, leo
+admins: kate, leo
+
+Directories (owner:group, mode)
+/shared/engineering  root:engineering  770
+/shared/marketing    root:marketing    770
+/shared/operations   root:operations   770
+/shared/company-docs root:admins       775
+/logs/reports        root:admins       775
+
+Access tests
+Alice, Emma, and Henry each created a file in their own team directory
+and were denied access to another team's directory.
+Kate created files in operations and company-docs.
+Alice read memo.txt and was denied write access.
+
+Setup notes
+The Amazon Linux image stalled before SSH became available under VZ.
+The original QEMU instance later booted successfully as
+cloudbyte-qemu-backup, with the project folder mounted at /host.
