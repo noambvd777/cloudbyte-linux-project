@@ -41,3 +41,28 @@ log in one go. Run it on the VM with:
 
     # Track 2 (Lima): repo is mounted at /host inside the VM
     bash /host/verify-foundations.sh
+
+
+## Section 2: File Management and Permissions
+
+Configured setgid on the team folders so new files inherit the team's group.
+Added a shared dropbox with a sticky bit to protect submissions from deletion
+by other contributors. See the [permissions test report](docs/permissions-test-report.md)
+for the expected and observed results.
+
+| Path | Owner:Group | Mode | Behavior |
+|---|---|---|---|
+| `/shared/engineering` | `root:engineering` | `2770` | New files inherit group `engineering`. |
+| `/shared/marketing` | `root:marketing` | `2770` | New files inherit group `marketing`. |
+| `/shared/operations` | `root:operations` | `2770` | New files inherit group `operations`. |
+| `/shared/dropbox` | `root:admins` | `1773` | Contributors can submit files but cannot list the directory. The sticky bit prevents cross-user deletion. |
+
+### Verification
+
+Run inside the Lima VM:
+
+```bash
+bash /host/verify-permissions.sh
+```
+
+Verified on the CloudByte VM: **18 passed, 0 failed**.
