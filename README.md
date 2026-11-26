@@ -66,3 +66,30 @@ bash /host/verify-permissions.sh
 ```
 
 Verified on the CloudByte VM: **18 passed, 0 failed**.
+
+## Section 3: User Onboarding Automation
+
+`scripts/onboard-user.sh` creates a user from interactive prompts or
+processes a batch of users from a CSV file. It skips accounts that already
+exist and can preview the actions it would take.
+
+| Flag | Purpose |
+| --- | --- |
+| `--csv PATH` | Read users from a CSV with `username,group,fullname` columns |
+| `--dry-run` | Print intended actions without creating accounts |
+| `-h`, `--help` | Show usage instructions |
+
+A sample CSV is available at `data/new-hires.csv`.
+
+### Verification
+
+Run `verify-onboarding.sh` inside the VM to check the script, CSV,
+team memberships, and repeat-run behavior.
+
+```bash
+# Lima
+bash /host/verify-onboarding.sh
+
+# Vagrant
+bash /vagrant/verify-onboarding.sh
+```
