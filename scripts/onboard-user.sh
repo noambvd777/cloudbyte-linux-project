@@ -7,6 +7,7 @@
 # Usage: sudo bash onboard-user.sh
 # Usage: sudo bash onboard-user.sh --csv path/to/new-hires.csv
 # Usage: sudo bash onboard-user.sh --dry-run
+# Usage: sudo bash onboard-user.sh [--csv PATH] [--dry-run] --log
 
 set -eo pipefail
 
@@ -18,6 +19,7 @@ fi
 
 TEMP_PASSWORD="ChangeMe123!"
 DRY_RUN=false
+AUDIT_LOG_ENABLED=false
 CSV_FILE=""
 
 while [ $# -gt 0 ]; do
@@ -28,6 +30,10 @@ while [ $# -gt 0 ]; do
             ;;
         --dry-run)
             DRY_RUN=true
+            shift
+            ;;
+        --log)
+            AUDIT_LOG_ENABLED=true
             shift
             ;;
         -h|--help)
@@ -58,10 +64,16 @@ if getent passwd "$username" >/dev/null 2>&1; then
     echo "Skip: user '$username' already exists."
     return 0
 fi
-useradd -m -c "$fullname" "$username"
-echo "$username:$TEMP_PASSWORD" | chpasswd
-usermod -aG "$group" "$username"
-chage -d 0 "$username"
+    useradd -m -c "$fullname" "$username" || return 1
+    echo "$username:$TEMP_PASSWORD" | chpasswd || return 1
+    usermod -aG "$group" "$username" || return 1
+    chage -d 0 "$username" || return 1
+
+    if [ "$AUDIT_LOG_ENABLED" = true ]; then
+        local timestamp
+        timestamp=$(date "+%Y-%m-%d %H:%M:%S") || return 1
+        printf '%s  created  %s  %s\n' "$timestamp" "$username" "$group" >> /var/log/cloudbyte-onboarding.log || return 1
+    fi
 
 echo "Created $username in group $group with temp password (must change on first login)."
 }
